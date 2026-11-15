@@ -20,10 +20,14 @@ export const chatController = {
         });
       }
       const pairKey = `${userAId}_${userBId}`;
-
+      
       const users = await User.findAll({
-        where: { id: [userAId, userBId] },
+        where: {
+          id: [userAId, userBId],
+        },
+        logging: console.log,
       });
+      console.log("aaaaa")
 
       if (users.length !== 2) {
         throw ApiError({
@@ -38,26 +42,35 @@ export const chatController = {
           .status(200)
           .json(ApiResponse({ chatId: existing.id }, "Existing chat found"));
       }
+      console.log("Existing", existing);
 
-     const result = await squelizer.transaction(async (transaction: Transaction) => {
-      const chat = await Chat.create({ pairKey, type: "direct" }, { transaction });
+      const result = await squelizer.transaction(
+        async (transaction: Transaction) => {
+          const chat = await Chat.create(
+            { pairKey, type: "direct" },
+            { transaction },
+          );
 
-      await ChatMember.bulkCreate(
-        [
-          { chatId: chat.id, userId: userAId },
-          { chatId: chat.id, userId: userBId }
-        ],
-        { transaction }
+          await ChatMember.bulkCreate(
+            [
+              { chatId: String(chat.id), userId: userAId },
+              { chatId: String(chat.id), userId: userBId },
+            ],
+            { transaction },
+          );
+
+          return chat;
+        },
       );
-
-      return chat;
-    });
-
+      console.log("result", result);
       res
         .status(201)
         .json(ApiResponse({ chatId: result.id }, "Chat created successfully"));
     } catch (error) {
-      throw ApiError({statusCode:500,message:"Internal Server Error with chat."});
+      throw ApiError({
+        statusCode: 500,
+        message: "Internal Server Error with chat.",
+      });
     }
   },
 };

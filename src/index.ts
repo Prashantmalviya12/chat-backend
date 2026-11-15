@@ -1,11 +1,16 @@
 import app from "./app.js";
-import { squelizer } from "./config/db.js";
-import { firebaseDB } from "./config/firebase.js";
+import dotenv from "dotenv"
+dotenv.config()
+
 
 const PORT = process.env.PORT||8000
 
 const startServer = async (): Promise<void> => {
   try {
+    const { default: app } = await import("./app.js");
+    const { squelizer } = await import("./config/db.js");
+
+    console.log("db_Name",process.env.DB_NAME)
     await squelizer.authenticate();
     console.log("Databased Connected Successfully.");
 

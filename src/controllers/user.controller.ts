@@ -7,7 +7,7 @@ export const userController = {
   listUserChats: async (req: Request, res: Response) => {
     try {
         const { userId } = req.params;
-    const user = await User.findByPk(userId);
+    const user = await User.findByPk(String(userId));
     if (!user) throw ApiError({ statusCode: 404, message: "User not found" });
 
     const memberships = await ChatMember.findAll({
@@ -37,7 +37,7 @@ export const userController = {
           chatId: chat.id,
           type: chat.type,
           createdAt: chat.createdAt,
-          members: (chat.members || []).map((member) => member.userId),
+          members: (chat.members || []).map((member:any) => member.userId),
         };
       })
       .filter((chat) => chat !== null);
@@ -49,4 +49,5 @@ export const userController = {
         console.log("User List error",error)
         throw ApiError({statusCode:500,message:"Internal Server Error"})
     }
-};
+}
+}

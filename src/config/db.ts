@@ -1,25 +1,25 @@
 import { Sequelize } from "sequelize";
 
-const dbName = process.env.DB_NAME;
-const dbUsername = process.env.DB_USERNAME;
-const dbPassword = process.env.DB_PASSWORD;
-const dbHost = process.env.DB_HOST;
-const dbPort = process.env.DB_PORT;
-const nodeEnvironment = process.env.NODE_ENV;
+const required = ["DB_NAME", "DB_USERNAME", "DB_PASSWORD"] as const;
+
+for (const key of required) {
+  if (!process.env[key]) {
+    throw new Error(`Missing required environment variable: ${key}`);
+  }
+}
 
 export const squelizer = new Sequelize(
-    
-  dbName as string,
-  dbUsername as string,
-  dbPassword as string,
+  process.env.DB_NAME as string,
+  process.env.DB_USERNAME as string,
+  process.env.DB_PASSWORD as string,
   {
-    host: dbHost,
-    port: Number(dbPort || 5432),
+    host: process.env.DB_HOST || "localhost",
+    port: Number(process.env.DB_PORT || 5432),
     dialect: "postgres",
-    logging: nodeEnvironment === "development" ? console.log : false,
+    logging: process.env.NODE_ENV === "development" ? console.log : false,
     define: {
       underscored: true,
-      timestamps: true,
+      timestamps: true
     },
     pool: {
       max: 10,
@@ -27,5 +27,5 @@ export const squelizer = new Sequelize(
       acquire: 30000,
       idle: 10000
     }
-  },
+  }
 );

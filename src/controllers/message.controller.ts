@@ -29,7 +29,7 @@ export const messageController = {
           message: "User is not a member of this chat",
         });
       }
-      const messageRef = messagesCollection(chatId).doc();
+      const messageRef = messagesCollection(String(chatId)).doc();
       const messageData = {
         senderId,
         text,
@@ -39,7 +39,7 @@ export const messageController = {
       await messageRef.set(messageData);
 
       // Keep a small chat-level summary for future chat-list previews.
-      await firebaseDB.collection("chats").doc(chatId).set(
+      await firebaseDB.collection("chats").doc(String(chatId)).set(
         {
           lastMessageId: messageRef.id,
           lastMessageText: text,
@@ -71,6 +71,7 @@ export const messageController = {
         cursor?: string;
         userId?: string;
       };
+      console.log("get message",limit)
 
       if (!userId) {
         throw ApiError({
@@ -89,12 +90,12 @@ export const messageController = {
         });
       }
 
-      let query = messagesCollection(chatId)
+      let query = messagesCollection(String(chatId))
         .orderBy("createdAt", "desc")
-        .limit(limit);
+        .limit(Number(limit));
 
       if (cursor) {
-        const cursorSnapshot = await messagesCollection(chatId)
+        const cursorSnapshot = await messagesCollection(String(chatId))
           .doc(cursor)
           .get();
         if (!cursorSnapshot.exists)
@@ -122,7 +123,7 @@ export const messageController = {
         ApiResponse(
           {
             messages,
-            nextCursor: docs.length === limit ? (docs[0]?.id ?? null) : null,
+            nextCursor: docs.length === Number(limit) ? (docs[0]?.id ?? null) : null,
           },
           "Messages retrieved successfully",
         ),
@@ -147,7 +148,7 @@ export const messageController = {
           message: "User is not a member of this chat",
         });
       }
-      const messageRef = messagesCollection(chatId).doc(messageId);
+      const messageRef = messagesCollection(String(chatId)).doc(String(messageId));
       const message = await messageRef.get();
       if (!message.exists)
         throw ApiError({ statusCode: 404, message: "Message not found" });
@@ -191,7 +192,7 @@ export const messageController = {
       });
     }
 
-    const messageRef = messagesCollection(chatId).doc(messageId);
+    const messageRef = messagesCollection(String(chatId)).doc(messageId);
     const messageSnapshot = await messageRef.get();
     if (!messageSnapshot.exists)
       throw ApiError({ statusCode: 404, message: "Message not found" });
@@ -206,7 +207,7 @@ export const messageController = {
 
     const lastSeenRef = firebaseDB
       .collection("chats")
-      .doc(chatId)
+      .doc(String(chatId))
       .collection("lastSeen")
       .doc(userId);
 
@@ -214,7 +215,7 @@ export const messageController = {
     if (current.exists) {
       const currentMessageId = current.get("messageId") as string | undefined;
       if (currentMessageId) {
-        const currentMessage = await messagesCollection(chatId)
+        const currentMessage = await messagesCollection(String(chatId))
           .doc(currentMessageId)
           .get();
 
