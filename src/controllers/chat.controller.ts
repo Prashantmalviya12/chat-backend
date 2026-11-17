@@ -27,7 +27,7 @@ export const chatController = {
         },
         logging: console.log,
       });
-      console.log("aaaaa")
+      // console.log("aaaaa")
 
       if (users.length !== 2) {
         throw ApiError({
@@ -42,7 +42,7 @@ export const chatController = {
           .status(200)
           .json(ApiResponse({ chatId: existing.id }, "Existing chat found"));
       }
-      console.log("Existing", existing);
+      // console.log("Existing", existing);
 
       const result = await squelizer.transaction(
         async (transaction: Transaction) => {

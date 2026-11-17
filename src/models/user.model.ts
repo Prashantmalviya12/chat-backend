@@ -10,9 +10,10 @@ export class User extends Model<
   InferAttributes<User>,
   InferCreationAttributes<User>
 > {
-  declare id: string;
+  declare id: CreationOptional<string>;
   declare name: string;
   declare email: string;
+  declare password: string;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
@@ -33,6 +34,10 @@ User.init(
       allowNull: false,
       unique: true,
       validate: { isEmail: true },
+    },
+    password: {
+      type: DataTypes.STRING(225),
+      allowNull:true
     },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
