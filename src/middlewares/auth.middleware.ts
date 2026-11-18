@@ -22,18 +22,22 @@ export interface AuthRequest extends Request {
 
 export const verifyToken = asyncHandler(async (req:AuthRequest , _, next) => {
   try {
+    // console.log("r",req.header("Authorization"))
     const token =
       (await req.cookies.accessToken) ||
       req.header("Authorization")?.replace("Bearer ", "");
 
-    if (!token) {
-      throw ApiError({ statusCode: 401, message: "Unauthorized" });
-    }
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET!,
-    ) as AuthTokenPayload;
-
+      console.log("token",token)
+      
+      if (!token) {
+        throw ApiError({ statusCode: 401, message: "Unauthorized" });
+      }
+      const decoded = jwt.verify(
+        token,
+        process.env.JWT_SECRET!,
+      ) as AuthTokenPayload;
+      console.log("decoded",decoded)
+      
     const userExist = await User.findOne({ where: { id: decoded.id } });
     if (!userExist) {
       throw ApiError({ statusCode: 401, message: "User not found" });

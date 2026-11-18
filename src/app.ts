@@ -6,12 +6,14 @@ import authRoutes from "../src/routes/auth.routes.js";
 import chatRoutes from "../src/routes/chat.routes.js";
 import messageRoutes from "../src/routes/message.route.js";
 import userRoutes from "../src/routes/user.route.js";
+import cookieParser from "cookie-parser"
 
 const app = express();
 
 app.use(express.json());
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser())
 
 // app.get("/health", (_req: Request, res: Response) => {
 //   res.status(200).json({
